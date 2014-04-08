@@ -1,8 +1,10 @@
 {
-	"name": "app",
-	"dependencies": {},
-	"local": [],
-	"paths": [],
-	"scripts": [],
-	"styles": ["styles.css"]
+  "name": "app",
+  "dependencies": {},
+  "local": [],
+  "paths": [],
+  "scripts": [],
+  "styles": [
+    "styles.css"
+  ]
 }
