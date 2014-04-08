@@ -1,81 +1,176 @@
 console.log('Initializing...');
 
 
-// set vars
+// Options
+
+var options = {
+	pageWidth: 600,
+	fullScreenMode: false,
+	doublePage: false,
+	startingPageNum: 1,
+	maxPages: 10
+};
+
+
+// vars
+var visor, content1, content2, currentContent = 2, currentPageNum, currentImg;
 var path = './assets/mouseguard/';
-var images = [];
-var i, num, url;
-var maxPages = 10;
-var pageScale = 0.25;
 
 
-// Create elements
+// Display Page
+
+function displayPage(img) {
+	if (currentContent === 1) {
+		content2.style.backgroundImage = "url('" + img.src + "')";
+		content2.style.opacity = 1;
+		content1.style.opacity = 0;
+		currentContent = 2;
+	} else {
+		content1.style.backgroundImage = "url('" + img.src + "')";
+		content1.style.opacity = 1;
+		content2.style.opacity = 0;
+		currentContent = 1;
+	}
+}
+
+
+// Load Page
+
+function loadPage(pageNum, resize) {
+	var num = pageNum;
+	if (pageNum < 100) { num = '0' + pageNum; }
+	if (pageNum < 10) { num = '00' + pageNum; }
+
+	var img = new Image();
+
+	img.onload = function () {
+		if (resize) {
+			visor.style.width = options.pageWidth + 'px';
+			visor.style.height = (options.pageWidth * img.height / img.width) + 'px';
+			visor.style.display = 'block';
+		}
+
+		currentImg = img;
+		displayPage(img);
+	};
+
+	img.src = path + num + '.jpg';
+}
+
+
+// Change Page in given direction
+
+function changePage(dir) {
+	currentPageNum += dir;
+
+	if (currentPageNum < 1) {
+		currentPageNum = 1;
+		return;
+	}
+
+	if (currentPageNum > options.maxPages) {
+		currentPageNum = options.maxPages;
+		return;
+	}
+
+	loadPage(currentPageNum);
+}
+
+
+// Resize visor adjusting image ratio, and depending on fullScreenMode
+
+function resizeVisor() {
+	if (options.fullScreenMode) {
+		visor.style.width = '100%';
+		visor.style.height = (visor.clientWidth * currentImg.height / currentImg.width) + 'px';
+	} else {
+		visor.style.width = options.pageWidth + 'px';
+		visor.style.height = (options.pageWidth * currentImg.height / currentImg.width) + 'px';
+	}
+}
+
+
+// Toggle fullscreen
+
+function toggleFullScreenMode() {
+	options.fullScreenMode = !options.fullScreenMode;
+
+	if (options.fullScreenMode) {
+		visor.className = 'visor';
+	} else {
+		visor.className = 'visor centered';
+	}
+
+	resizeVisor();
+}
+
+// Initialize Application
 
 function initialize() {
 
-	function createDiv(parent, className) {
-		var div = document.createElement('div');
-		div.id = className;
-		div.className = className;
-		parent.appendChild(div);
-		return div;
+	// Create elements
+
+	function createElm(parent, elmType, className) {
+		var elm = document.createElement(elmType);
+		elm.id = className;
+		elm.className = className;
+		parent.appendChild(elm);
+		return elm;
 	}
 
-	var title = createDiv(document.body, 'title');
+	var menu = createElm(document.body, 'div', 'menu');
+
+	var title = createElm(menu, 'span', 'title');
 	title.innerHTML = 'Comic Reader';
 
-	var pageWidth = images[1].width * pageScale;
-	var pageHeight = images[1].height * pageScale;
-
-	var visor = createDiv(document.body, 'visor');
-	visor.style.width = (10 + (4 + pageWidth) * maxPages) + 'px';
-	visor.style.height = (10 + (4 + pageHeight) * maxPages) + 'px';
-
-	var pages = [];
-
-	for (i = 1; i <= maxPages; i++) {
-		var page = createDiv(visor, 'page');
-
-		num = i;
-		if (i < 100) { num = '0' + i; }
-		if (i < 10) { num = '00' + i; }
-
-		url = path + num + '.jpg';
-		page.style.backgroundImage = "url('" + url + "')";
-		page.style.width = pageWidth + 'px';
-		page.style.height = pageHeight + 'px';
-
-		pages.push(page);
-	}
-}
+	var btn = createElm(menu, 'button', 'fullScreenButton');
+	btn.innerHTML = 'Full Screen';
+	btn.onclick = function () {
+		console.log('Clicked on button!');
+		toggleFullScreenMode();
+	};
 
 
-// load comic pages
-var c = 0;
+	visor = createElm(document.body, 'div', 'visor centered');
+	visor.style.display = 'none';
+	content1 = createElm(visor, 'div', 'content');
+	content2 = createElm(visor, 'div', 'content');
 
-function loadImage(i, url) {
-	console.log('loading', url);
-	var img = new Image();
-	img.onload = function () {
-		images[i] = img;
-		console.log(img);
-		c++;
-		if (c === maxPages) {
-			initialize();
+
+	// Create Navigation
+
+	document.onkeydown = function (evt) {
+		evt = evt || window.event;
+		switch (evt.keyCode) {
+			case 37:
+				changePage(-1);
+				break;
+			case 39:
+				changePage(1);
+				break;
+			case 38:
+				console.log('Up');
+				break;
+			case 40:
+				console.log('Down');
+				break;
 		}
 	};
-	img.src = url;
+
+
+	// Load starting page
+
+	currentPageNum = options.startingPageNum;
+	loadPage(currentPageNum, true);
 }
 
+initialize();
 
-for (i = 1; i <= maxPages; i++) {
-	num = i;
-	if (i < 100) { num = '0' + i; }
-	if (i < 10) { num = '00' + i; }
+window.onresize = function () {
+	console.log('RESIZE!');
+	resizeVisor();
+};
 
-	url = path + num + '.jpg';
-	loadImage(i, url);
-}
 
 
 
