@@ -20,17 +20,57 @@ var path = './assets/mouseguard/';
 // Display Page
 
 function displayPage(img) {
+	var prev, next;
+
 	if (currentContent === 1) {
-		content2.style.backgroundImage = "url('" + img.src + "')";
-		content2.style.opacity = 1;
-		content1.style.opacity = 0;
+		prev = content1;
+		next  = content2;
 		currentContent = 2;
 	} else {
-		content1.style.backgroundImage = "url('" + img.src + "')";
-		content1.style.opacity = 1;
-		content2.style.opacity = 0;
+		prev = content2;
+		next  = content1;
 		currentContent = 1;
 	}
+
+
+	prev.style.transform = 'translateX(0)';
+	prev.style.zIndex = 0;
+
+	next.style.backgroundImage = "url('" + img.src + "')";
+	next.style.transform = 'translateX(0)';
+	next.style.zIndex = 1;
+
+	/*var playerPrev = document.timeline.play(
+		new window.Animation(prev,
+		[ { transform: 'translateX(-100%)' } ],
+		{ direction: "normal",
+			duration: 0.5,
+			iterations: 1,
+			fill: 'both'
+		}),
+		new window.Animation(next,
+			[ { transform: 'translateX(0)' } ],
+			{ direction: "normal",
+				duration: 0.5,
+				iterations: 1,
+				fill: 'both'
+			})
+
+
+	);*/
+
+
+
+
+	/*var playerNext = document.timeline.play(new window.Animation(next,
+		[ { transform: 'translateX(0)' } ],
+		{ direction: "normal",
+			duration: 0.5,
+			iterations: 1,
+			fill: 'both'
+		}));*/
+
+
 }
 
 
@@ -104,6 +144,8 @@ function toggleFullScreenMode() {
 	resizeVisor();
 }
 
+
+
 // Initialize Application
 
 function initialize() {
@@ -162,6 +204,17 @@ function initialize() {
 
 	currentPageNum = options.startingPageNum;
 	loadPage(currentPageNum, true);
+
+	console.log('>>>', document.timeline);
+
+	/*var player = document.timeline.play(new Animation(content1, [
+			{ opacity: "0.5", transform: "scale(0.5)" },
+			{ opacity: "1.0", transform: "scale(1)" }
+		],
+		{ direction: "alternate",
+			duration: 0.5,
+			iterations: Infinity
+		}));*/
 }
 
 initialize();
