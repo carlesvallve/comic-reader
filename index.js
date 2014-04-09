@@ -1,7 +1,6 @@
-console.log('Initializing...');
-
-
-// Options
+// ***************************************************************************
+// Set Vars
+// ***************************************************************************
 
 var options = {
 	pageWidth: 600,
@@ -17,7 +16,9 @@ var visor, content1, content2, currentContent = 2, currentPageNum, currentImg;
 var path = './assets/mouseguard/';
 
 
+// ***************************************************************************
 // Display Page
+// ***************************************************************************
 
 function displayPage(img) {
 	var prev, next;
@@ -32,49 +33,15 @@ function displayPage(img) {
 		currentContent = 1;
 	}
 
-
-	prev.style.transform = 'translateX(0)';
-	prev.style.zIndex = 0;
-
 	next.style.backgroundImage = "url('" + img.src + "')";
-	next.style.transform = 'translateX(0)';
 	next.style.zIndex = 1;
-
-	/*var playerPrev = document.timeline.play(
-		new window.Animation(prev,
-		[ { transform: 'translateX(-100%)' } ],
-		{ direction: "normal",
-			duration: 0.5,
-			iterations: 1,
-			fill: 'both'
-		}),
-		new window.Animation(next,
-			[ { transform: 'translateX(0)' } ],
-			{ direction: "normal",
-				duration: 0.5,
-				iterations: 1,
-				fill: 'both'
-			})
-
-
-	);*/
-
-
-
-
-	/*var playerNext = document.timeline.play(new window.Animation(next,
-		[ { transform: 'translateX(0)' } ],
-		{ direction: "normal",
-			duration: 0.5,
-			iterations: 1,
-			fill: 'both'
-		}));*/
-
-
+	prev.style.zIndex = 0;
 }
 
 
+// ***************************************************************************
 // Load Page
+// ***************************************************************************
 
 function loadPage(pageNum, resize) {
 	var num = pageNum;
@@ -90,15 +57,20 @@ function loadPage(pageNum, resize) {
 			visor.style.display = 'block';
 		}
 
-		currentImg = img;
-		displayPage(img);
+		//currentImg = img;
+		//displayPage(img);
 	};
 
 	img.src = path + num + '.jpg';
+
+	currentImg = img;
+	displayPage(img);
 }
 
 
+// ***************************************************************************
 // Change Page in given direction
+// ***************************************************************************
 
 function changePage(dir) {
 	currentPageNum += dir;
@@ -117,7 +89,9 @@ function changePage(dir) {
 }
 
 
+// ***************************************************************************
 // Resize visor adjusting image ratio, and depending on fullScreenMode
+// ***************************************************************************
 
 function resizeVisor() {
 	if (options.fullScreenMode) {
@@ -130,7 +104,9 @@ function resizeVisor() {
 }
 
 
+// ***************************************************************************
 // Toggle fullscreen
+// ***************************************************************************
 
 function toggleFullScreenMode() {
 	options.fullScreenMode = !options.fullScreenMode;
@@ -145,11 +121,11 @@ function toggleFullScreenMode() {
 }
 
 
-
+// ***************************************************************************
 // Initialize Application
+// ***************************************************************************
 
 function initialize() {
-
 	// Create elements
 
 	function createElm(parent, elmType, className) {
@@ -204,17 +180,6 @@ function initialize() {
 
 	currentPageNum = options.startingPageNum;
 	loadPage(currentPageNum, true);
-
-	console.log('>>>', document.timeline);
-
-	/*var player = document.timeline.play(new Animation(content1, [
-			{ opacity: "0.5", transform: "scale(0.5)" },
-			{ opacity: "1.0", transform: "scale(1)" }
-		],
-		{ direction: "alternate",
-			duration: 0.5,
-			iterations: Infinity
-		}));*/
 }
 
 initialize();
@@ -223,6 +188,50 @@ window.onresize = function () {
 	console.log('RESIZE!');
 	resizeVisor();
 };
+
+
+// ***************************************************************************
+// Animation
+// ***************************************************************************
+
+/*var player = document.timeline.play(new Animation(content1, [
+ { opacity: "0.5", transform: "scale(0.5)" },
+ { opacity: "1.0", transform: "scale(1)" }
+ ],
+ { direction: "alternate",
+ duration: 0.5,
+ iterations: Infinity
+ }));*/
+
+//next.style.transform = 'translateX(0)';
+//prev.style.transform = 'translateX(0)';
+
+
+/*var playerPrev = document.timeline.play(
+ new window.Animation(prev,
+ [ { transform: 'translateX(-100%)' } ],
+ { direction: "normal",
+ duration: 0.5,
+ iterations: 1,
+ fill: 'both'
+ }),
+ new window.Animation(next,
+ [ { transform: 'translateX(0)' } ],
+ { direction: "normal",
+ duration: 0.5,
+ iterations: 1,
+ fill: 'both'
+ })
+ );*/
+
+
+/*var playerNext = document.timeline.play(new window.Animation(next,
+ [ { transform: 'translateX(0)' } ],
+ { direction: "normal",
+ duration: 0.5,
+ iterations: 1,
+ fill: 'both'
+ }));*/
 
 
 
