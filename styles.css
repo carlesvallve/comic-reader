@@ -10,8 +10,8 @@ body {
     background-color: #fff;
 }
 
-div {
-    box-sizing: border-box;
+div, span, img {
+    -webkit-box-sizing: border-box;
 }
 
 .menu {
@@ -53,4 +53,7 @@ div {
     background-size: 100% 100%;
     background-repeat: no-repeat;
     background-position: 50% 50%;
+
+    -webkit-user-select:none;
+    -webkit-user-drag: none;
 }

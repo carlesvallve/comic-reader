@@ -12,8 +12,8 @@ var options = {
 
 
 // vars
-var visor, content1, content2, currentContent = 2, currentPageNum, currentImg;
-var path = './assets/mouseguard/';
+var visor, content1, content2, currentContentNum = 2, currentPageNum, currentImg;
+var path = 'http://comics.cv.dev.wizcorp.jp/mouseguard/';
 
 
 // ***************************************************************************
@@ -23,14 +23,14 @@ var path = './assets/mouseguard/';
 function displayPage(img) {
 	var prev, next;
 
-	if (currentContent === 1) {
+	if (currentContentNum === 1) {
 		prev = content1;
 		next  = content2;
-		currentContent = 2;
+		currentContentNum = 2;
 	} else {
 		prev = content2;
 		next  = content1;
-		currentContent = 1;
+		currentContentNum = 1;
 	}
 
 	next.style.backgroundImage = "url('" + img.src + "')";
@@ -43,28 +43,26 @@ function displayPage(img) {
 // Load Page
 // ***************************************************************************
 
-function loadPage(pageNum, resize) {
+function loadPage(pageNum, cb) {
+	// get page url
 	var num = pageNum;
 	if (pageNum < 100) { num = '0' + pageNum; }
 	if (pageNum < 10) { num = '00' + pageNum; }
+	var url = path + num + '.jpg';
 
 	var img = new Image();
 
 	img.onload = function () {
-		if (resize) {
-			visor.style.width = options.pageWidth + 'px';
-			visor.style.height = (options.pageWidth * img.height / img.width) + 'px';
-			visor.style.display = 'block';
-		}
+		if (cb) { cb(img); }
 
-		//currentImg = img;
-		//displayPage(img);
+		// display the laoded page
+		displayPage(img);
 	};
 
-	img.src = path + num + '.jpg';
+	img.src = url;
 
+	// record current content image
 	currentImg = img;
-	displayPage(img);
 }
 
 
@@ -93,15 +91,20 @@ function changePage(dir) {
 // Resize visor adjusting image ratio, and depending on fullScreenMode
 // ***************************************************************************
 
-function resizeVisor() {
+function resizeVisor(img) {
 	if (options.fullScreenMode) {
 		visor.style.width = '100%';
-		visor.style.height = (visor.clientWidth * currentImg.height / currentImg.width) + 'px';
+		visor.style.height = (visor.clientWidth * img.height / currentImg.width) + 'px';
 	} else {
 		visor.style.width = options.pageWidth + 'px';
-		visor.style.height = (options.pageWidth * currentImg.height / currentImg.width) + 'px';
+		visor.style.height = (options.pageWidth * img.height / currentImg.width) + 'px';
 	}
 }
+
+
+window.onresize = function () {
+	resizeVisor(currentImg);
+};
 
 
 // ***************************************************************************
@@ -144,7 +147,6 @@ function initialize() {
 	var btn = createElm(menu, 'button', 'fullScreenButton');
 	btn.innerHTML = 'Full Screen';
 	btn.onclick = function () {
-		console.log('Clicked on button!');
 		toggleFullScreenMode();
 	};
 
@@ -153,6 +155,10 @@ function initialize() {
 	visor.style.display = 'none';
 	content1 = createElm(visor, 'div', 'content');
 	content2 = createElm(visor, 'div', 'content');
+
+	visor.onmousedown = function (e) {
+		changePage(e.offsetX >= visor.clientWidth / 2 ? 1 : -1);
+	};
 
 
 	// Create Navigation
@@ -179,15 +185,16 @@ function initialize() {
 	// Load starting page
 
 	currentPageNum = options.startingPageNum;
-	loadPage(currentPageNum, true);
+
+	loadPage(currentPageNum, function (img) {
+		visor.style.display = 'block';
+		resizeVisor(img);
+	});
 }
 
 initialize();
 
-window.onresize = function () {
-	console.log('RESIZE!');
-	resizeVisor();
-};
+
 
 
 // ***************************************************************************
