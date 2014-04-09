@@ -120,7 +120,7 @@ function toggleFullScreenMode() {
 		visor.className = 'visor centered';
 	}
 
-	resizeVisor();
+	resizeVisor(currentImg);
 }
 
 
