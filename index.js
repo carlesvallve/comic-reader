@@ -2,18 +2,20 @@
 // Set Vars
 // ***************************************************************************
 
+var path = 'http://comics.cv.dev.wizcorp.jp/mouseguard/';
+var images = [];
+
 var options = {
 	pageWidth: 600,
 	fullScreenMode: false,
 	doublePage: false,
 	startingPageNum: 1,
-	maxPages: 10
+	maxPages: 10,
+	pageBufferSize: 5
 };
 
-
-// vars
-var visor, content1, content2, currentContentNum = 2, currentPageNum, currentImg;
-var path = 'http://comics.cv.dev.wizcorp.jp/mouseguard/';
+var visor, content1, content2;
+var currentPageNum, currentImg, currentContentNum = 2;
 
 
 // ***************************************************************************
@@ -53,15 +55,18 @@ function loadPage(pageNum, cb) {
 	var img = new Image();
 
 	img.onload = function () {
-		if (cb) { cb(img); }
 
-		// display the laoded page
-		displayPage(img);
+
+		// return optionsl callback
+		if (cb) { cb(img); }
 	};
 
 	img.src = url;
 
-	// record current content image
+	// record loaded img into images associative array
+	images[pageNum] = { num: pageNum, img: img };
+
+	// record current image for being able to access its size later
 	currentImg = img;
 }
 
@@ -71,6 +76,7 @@ function loadPage(pageNum, cb) {
 // ***************************************************************************
 
 function changePage(dir) {
+	// get page number
 	currentPageNum += dir;
 
 	if (currentPageNum < 1) {
@@ -83,7 +89,18 @@ function changePage(dir) {
 		return;
 	}
 
-	loadPage(currentPageNum);
+	// display page
+	displayPage(images[currentPageNum].img);
+
+	// get next page to preload
+	var pageNumToLoad = currentPageNum + (options.pageBufferSize - 1) * dir;
+	if (pageNumToLoad > options.maxPages) { return; }
+	if (pageNumToLoad < 1) { return; }
+
+	// preload next page in queue
+	//if (!images[pageNumToLoad]) {
+	loadPage(pageNumToLoad);
+	//}
 }
 
 
@@ -181,15 +198,29 @@ function initialize() {
 		}
 	};
 
+	// Preload pageBufferSize page images, every time we change page, preload next page in queue
 
-	// Load starting page
+	images = [];
+	var c = 0;
 
-	currentPageNum = options.startingPageNum;
+	function preloadPage(i) {
+		loadPage(options.startingPageNum + i, function (img) {
+			c++;
+			// once all pages in buffer size has been loaded
+			if (c === options.pageBufferSize) {
+				// initialize visor and display first page
+				visor.style.display = 'block';
+				currentPageNum = options.startingPageNum;
+				img = images[currentPageNum].img;
+				resizeVisor(img);
+				displayPage(img);
+			}
+		});
+	}
 
-	loadPage(currentPageNum, function (img) {
-		visor.style.display = 'block';
-		resizeVisor(img);
-	});
+	for (var i = 0; i < options.pageBufferSize; i++) {
+		preloadPage(i);
+	}
 }
 
 initialize();
